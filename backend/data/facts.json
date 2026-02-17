@@ -1,0 +1,21 @@
+{
+  "full_name": "Leonardo Jara",
+  "name": "Leo",
+  "current_role": "Data Scientist",
+  "location": "Capelle aan den IJssel, Netherlands",
+  "email": "leojarab@gmail.com",
+  "linkedin": "linkedin.com/in/leonardo-jara-454449a4",
+  "specialties": [
+    "Machine Learning",
+    "Healthcare AI",
+    "GenAI"
+  ],
+  "years_experience": 8,
+  "education": [
+    {
+      "degree": "Phd in Data Science",
+      "institution": "Granada University",
+      "year": "2023"
+    }
+  ]
+}
