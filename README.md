@@ -1,5 +1,3 @@
-# AI Digital Twin
-
 ![AI Digital Twin](frontend/public/digitaltwin.png)
 
 A production-ready AI chatbot platform that acts as a digital twin — an AI assistant that answers questions as if it were you. Built with Next.js, FastAPI, AWS Bedrock, and fully deployed on AWS serverless infrastructure via Terraform and GitHub Actions CI/CD.
