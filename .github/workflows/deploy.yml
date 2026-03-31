@@ -1,8 +1,6 @@
 name: Deploy Digital Twin
 #d
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       environment:
@@ -14,6 +12,14 @@ on:
           - dev
           - test
           - prod
+      apply_terraform:
+        description: 'Run terraform apply? (create/update infrastructure)'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 permissions:
   id-token: write
@@ -60,11 +66,10 @@ jobs:
 
       - name: Run Deployment Script
         run: |
-          # Set environment variables for the script
           export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
           export DEFAULT_AWS_REGION=${{ secrets.DEFAULT_AWS_REGION }}
-          
-          # Make script executable and run it
+          export APPLY_TERRAFORM=${{ github.event.inputs.apply_terraform || 'false' }}
+
           chmod +x scripts/deploy.sh
           ./scripts/deploy.sh ${{ github.event.inputs.environment || 'dev' }}
         env:

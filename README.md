@@ -313,13 +313,20 @@ api_throttling_rate_limit  = 5
 
 ### What the deploy script does
 
-1. Builds the Lambda deployment package using Docker (AWS Lambda Python 3.12 image for binary compatibility)
+The script behavior depends on the `APPLY_TERRAFORM` environment variable:
+
+**With `APPLY_TERRAFORM=false` (default):**
+1. Reads existing Terraform outputs (API URL, S3 bucket)
+2. If no infrastructure exists, exits with a message — nothing is created
+3. If infrastructure exists, builds the Next.js frontend and uploads it to S3
+
+**With `APPLY_TERRAFORM=true`:**
+1. Builds the Lambda deployment package using Docker (AWS Lambda Python 3.12 image)
 2. Initializes Terraform with the S3 backend
 3. Creates or selects the named workspace (dev / test / prod)
-4. Runs `terraform apply`
-5. Builds the Next.js frontend (`npm run build` → static export)
-6. Uploads frontend files to S3
-7. Prints the CloudFront and API Gateway URLs
+4. Runs `terraform apply` — creates or updates all AWS infrastructure
+5. Builds the Next.js frontend and uploads it to S3
+6. Prints the CloudFront and API Gateway URLs
 
 ### Teardown
 
@@ -338,9 +345,14 @@ Two GitHub Actions workflows are included.
 
 ### Deploy workflow (`.github/workflows/deploy.yml`)
 
-**Triggers:**
-- Push to `main` branch
-- Manual workflow dispatch (choose environment: dev / test / prod)
+**Trigger:** Manual only (`workflow_dispatch`) — never runs automatically on push.
+
+**Inputs:**
+
+| Input | Options | Default | Description |
+|---|---|---|---|
+| `environment` | dev / test / prod | `dev` | Target environment |
+| `apply_terraform` | true / false | `false` | Whether to create/update AWS infrastructure |
 
 **Authentication:** AWS OIDC — no long-lived credentials stored in GitHub secrets.
 
@@ -358,10 +370,12 @@ Two GitHub Actions workflows are included.
 3. Set up Python 3.12 + uv
 4. Set up Terraform
 5. Set up Node.js 20
-6. Run `scripts/deploy.sh`
+6. Run `scripts/deploy.sh` (with or without Terraform depending on input)
 7. Retrieve Terraform outputs
 8. Invalidate CloudFront cache
 9. Print deployment summary
+
+> To deploy infrastructure for the first time, run the workflow manually with `apply_terraform = true`.
 
 ### Destroy workflow (`.github/workflows/destroy.yml`)
 
